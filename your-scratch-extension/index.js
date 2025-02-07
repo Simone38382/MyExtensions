@@ -2,10 +2,10 @@ const BlockType = require('../../extension-support/block-type');
 const ArgumentType = require('../../extension-support/argument-type');
 const TargetType = require('../../extension-support/target-type');
 
-class Scratch3YourExtension {
+class Scratch3Canvas {
 
     constructor (runtime) {
-        // put any setup for your extension here
+        // Setup your extension here
     }
 
     /**
@@ -14,14 +14,14 @@ class Scratch3YourExtension {
     getInfo () {
         return {
             // unique ID for your extension
-            id: 'yourScratchExtension',
+            id: 'canvasExtension',
 
             // name that will be displayed in the Scratch UI
-            name: 'Demo',
+            name: 'Canvas',
 
-            // colours to use for your extension blocks
-            color1: '#000099',
-            color2: '#660066',
+            // colors to use for your extension blocks
+            color1: '#4CAF50',  // green for Canvas-related blocks
+            color2: '#8BC34A',  // lighter green
 
             // icons to display
             blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAAFklEQVQYV2P4DwMMEMgAI/+DEUIMBgAEWB7i7uidhAAAAABJRU5ErkJggg==',
@@ -30,71 +30,69 @@ class Scratch3YourExtension {
             // your Scratch blocks
             blocks: [
                 {
-                    // name of the function where your block code lives
-                    opcode: 'myFirstBlock',
+                    opcode: 'drawRectangle',
 
-                    // type of block - choose from:
-                    //   BlockType.REPORTER - returns a value, like "direction"
-                    //   BlockType.BOOLEAN - same as REPORTER but returns a true/false value
-                    //   BlockType.COMMAND - a normal command block, like "move {} steps"
-                    //   BlockType.HAT - starts a stack if its value changes from false to true ("edge triggered")
-                    blockType: BlockType.REPORTER,
-
-                    // label to display on the block
-                    text: 'My first block [MY_NUMBER] and [MY_STRING]',
-
-                    // true if this block should end a stack
+                    blockType: BlockType.COMMAND,
+                    text: 'Draw rectangle with width [WIDTH] and height [HEIGHT] at position [X] [Y]',
                     terminal: false,
-
-                    // where this block should be available for code - choose from:
-                    //   TargetType.SPRITE - for code in sprites
-                    //   TargetType.STAGE  - for code on the stage / backdrop
-                    // remove one of these if this block doesn't apply to both
                     filter: [ TargetType.SPRITE, TargetType.STAGE ],
-
-                    // arguments used in the block
                     arguments: {
-                        MY_NUMBER: {
-                            // default value before the user sets something
-                            defaultValue: 123,
-
-                            // type/shape of the parameter - choose from:
-                            //     ArgumentType.ANGLE - numeric value with an angle picker
-                            //     ArgumentType.BOOLEAN - true/false value
-                            //     ArgumentType.COLOR - numeric value with a colour picker
-                            //     ArgumentType.NUMBER - numeric value
-                            //     ArgumentType.STRING - text value
-                            //     ArgumentType.NOTE - midi music value with a piano picker
+                        WIDTH: {
+                            defaultValue: 100,
                             type: ArgumentType.NUMBER
                         },
-                        MY_STRING: {
-                            // default value before the user sets something
-                            defaultValue: 'hello',
-
-                            // type/shape of the parameter - choose from:
-                            //     ArgumentType.ANGLE - numeric value with an angle picker
-                            //     ArgumentType.BOOLEAN - true/false value
-                            //     ArgumentType.COLOR - numeric value with a colour picker
-                            //     ArgumentType.NUMBER - numeric value
-                            //     ArgumentType.STRING - text value
-                            //     ArgumentType.NOTE - midi music value with a piano picker
-                            type: ArgumentType.STRING
+                        HEIGHT: {
+                            defaultValue: 50,
+                            type: ArgumentType.NUMBER
+                        },
+                        X: {
+                            defaultValue: 0,
+                            type: ArgumentType.NUMBER
+                        },
+                        Y: {
+                            defaultValue: 0,
+                            type: ArgumentType.NUMBER
                         }
                     }
+                },
+                {
+                    opcode: 'clearCanvas',
+
+                    blockType: BlockType.COMMAND,
+                    text: 'Clear the canvas',
+                    terminal: false,
+                    filter: [ TargetType.SPRITE, TargetType.STAGE ],
+                    arguments: {}
                 }
             ]
         };
     }
 
+    /**
+     * Implementation for drawing a rectangle on the canvas.
+     */
+    drawRectangle ({ WIDTH, HEIGHT, X, Y }) {
+        // Assuming a canvas object exists on the stage
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Draw the rectangle
+        ctx.beginPath();
+        ctx.rect(X, Y, WIDTH, HEIGHT);
+        ctx.fillStyle = 'blue'; // Example color
+        ctx.fill();
+    }
 
     /**
-     * implementation of the block with the opcode that matches this name
-     *  this will be called when the block is used
+     * Clears the canvas.
      */
-    myFirstBlock ({ MY_NUMBER, MY_STRING }) {
-        // example implementation to return a string
-        return MY_STRING + ' : doubled would be ' + (MY_NUMBER * 2);
+    clearCanvas () {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear the entire canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 }
 
-module.exports = Scratch3YourExtension;
+module.exports = Scratch3Canvas;
